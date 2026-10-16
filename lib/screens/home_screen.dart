@@ -5,6 +5,7 @@ import 'add_task_screen.dart';
 import 'edit_task_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/task_cubit.dart';
+import 'api_tasks_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -77,7 +78,25 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(title: const Text('TaskFlow'), centerTitle: true),
+          appBar: AppBar(
+            title: const Text('TaskFlow'),
+            centerTitle: true,
+
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.cloud_download),
+                tooltip: 'View API Tasks',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ApiTasksScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
 
           body: Padding(
             padding: const EdgeInsets.all(16),

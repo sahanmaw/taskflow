@@ -3,6 +3,7 @@ import '../models/task.dart';
 import '../widgets/task_tile.dart';
 import 'add_task_screen.dart';
 import 'edit_task_screen.dart';
+import '../services/task_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,11 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Task> tasks = [
-    Task(id: '1', title: 'Learn Flutter widgets'),
-    Task(id: '2', title: 'Build TaskFlow UI'),
-    Task(id: '3', title: 'Practice Dart OOP', isCompleted: true),
-  ];
+  final TaskStorage storage = TaskStorage();
+  final List<Task> tasks = [];
   String filter = 'All';
 
   //changes the checkbox selection
@@ -24,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       task.isCompleted = !task.isCompleted;
     });
+    storage.saveTasks(tasks);
   }
 
   //delete task from the list
@@ -31,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       tasks.remove(task);
     });
+    storage.saveTasks(tasks);
   }
 
   //edit task title
@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       task.title = title;
     });
+    await storage.saveTasks(tasks);
   }
 
   //add new task to the list
@@ -68,6 +69,24 @@ class _HomeScreenState extends State<HomeScreen> {
           title: title,
         ),
       );
+    });
+    await storage.saveTasks(tasks);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadTasks();
+  }
+
+  Future<void> loadTasks() async {
+    final savedTasks = await storage.loadTasks();
+
+    if (!mounted) return;
+
+    setState(() {
+      tasks.clear();
+      tasks.addAll(savedTasks);
     });
   }
 

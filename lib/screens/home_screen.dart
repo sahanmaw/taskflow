@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Task(id: '2', title: 'Build TaskFlow UI'),
     Task(id: '3', title: 'Practice Dart OOP', isCompleted: true),
   ];
+  String filter = 'All';
 
   //changes the checkbox selection
   void toggleTask(Task task) {
@@ -72,6 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Task> filteredTasks = tasks;
+    if (filter == 'Active') {
+      filteredTasks = tasks.where((task) => !task.isCompleted).toList();
+    } else if (filter == 'Completed') {
+      filteredTasks = tasks.where((task) => task.isCompleted).toList();
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('TaskFlow'), centerTitle: true),
 
@@ -97,11 +104,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
+            Row(
+              children: [
+                for (final name in ['All', 'Active', 'Completed'])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(name),
+                      selected: filter == name,
+                      onSelected: (selected) {
+                        setState(() {
+                          filter = name;
+                        });
+                      },
+                    ),
+                  ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
             Expanded(
               child: ListView.builder(
-                itemCount: tasks.length,
+                itemCount: filteredTasks.length,
                 itemBuilder: (context, index) {
-                  final task = tasks[index];
+                  final task = filteredTasks[index];
 
                   return TaskTile(
                     task: task,

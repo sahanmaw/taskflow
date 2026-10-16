@@ -4,8 +4,14 @@ import '../models/task.dart';
 class TaskTile extends StatelessWidget {
   final Task task;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
 
-  const TaskTile({super.key, required this.task, required this.onTap});
+  const TaskTile({
+    super.key,
+    required this.task,
+    required this.onTap,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +29,10 @@ class TaskTile extends StatelessWidget {
               ? TextDecoration.lineThrough
               : TextDecoration.none,
         ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete_outline),
+        onPressed: onDelete,
       ),
     );
   }

@@ -24,6 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void deleteTask(Task task) {
+    setState(() {
+      tasks.remove(task);
+    });
+  }
+
   Future<void> addTask() async {
     final title = await Navigator.push<String>(
       context,
@@ -33,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted || title == null || title.isEmpty) {
       return;
     }
-
     setState(() {
       tasks.add(
         Task(
@@ -75,6 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     task: task,
                     onTap: () {
                       toggleTask(task);
+                    },
+                    onDelete: () {
+                      deleteTask(task);
                     },
                   );
                 },

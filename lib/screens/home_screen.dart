@@ -3,7 +3,8 @@ import '../models/task.dart';
 import '../widgets/task_tile.dart';
 import 'add_task_screen.dart';
 import 'edit_task_screen.dart';
-import '../services/task_storage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubits/task_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,24 +14,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TaskStorage storage = TaskStorage();
-  final List<Task> tasks = [];
   String filter = 'All';
 
   //changes the checkbox selection
-  void toggleTask(Task task) {
-    setState(() {
-      task.isCompleted = !task.isCompleted;
-    });
-    storage.saveTasks(tasks);
+  Future<void> toggleTask(Task task) async {
+    TaskCubit taskCubit = context.read<TaskCubit>();
+
+    await taskCubit.toggleTask(task);
   }
 
   //delete task from the list
-  void deleteTask(Task task) {
-    setState(() {
-      tasks.remove(task);
-    });
-    storage.saveTasks(tasks);
+  Future<void> deleteTask(Task task) async {
+    TaskCubit taskCubit = context.read<TaskCubit>();
+
+    await taskCubit.deleteTask(task);
   }
 
   //edit task title
@@ -46,10 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    setState(() {
-      task.title = title;
-    });
-    await storage.saveTasks(tasks);
+    TaskCubit taskCubit = context.read<TaskCubit>();
+
+    await taskCubit.editTask(task, title);
   }
 
   //add new task to the list
@@ -62,116 +58,100 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted || title == null || title.isEmpty) {
       return;
     }
-    setState(() {
-      tasks.add(
-        Task(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          title: title,
-        ),
-      );
-    });
-    await storage.saveTasks(tasks);
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    loadTasks();
-  }
+    TaskCubit taskCubit = context.read<TaskCubit>();
 
-  Future<void> loadTasks() async {
-    final savedTasks = await storage.loadTasks();
-
-    if (!mounted) return;
-
-    setState(() {
-      tasks.clear();
-      tasks.addAll(savedTasks);
-    });
+    await taskCubit.addTask(title);
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Task> filteredTasks = tasks;
-    if (filter == 'Active') {
-      filteredTasks = tasks.where((task) => !task.isCompleted).toList();
-    } else if (filter == 'Completed') {
-      filteredTasks = tasks.where((task) => task.isCompleted).toList();
-    }
-    return Scaffold(
-      appBar: AppBar(title: const Text('TaskFlow'), centerTitle: true),
+    return BlocBuilder<TaskCubit, List<Task>>(
+      builder: (context, tasks) {
+        List<Task> filteredTasks = tasks;
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'My Tasks',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+        if (filter == 'Active') {
+          filteredTasks = tasks.where((task) => !task.isCompleted).toList();
+        } else if (filter == 'Completed') {
+          filteredTasks = tasks.where((task) => task.isCompleted).toList();
+        }
 
-            const SizedBox(height: 8),
+        return Scaffold(
+          appBar: AppBar(title: const Text('TaskFlow'), centerTitle: true),
 
-            Text(
-              'You have ${tasks.length} tasks today',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color.fromARGB(255, 137, 136, 136),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Row(
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final name in ['All', 'Active', 'Completed'])
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(name),
-                      selected: filter == name,
-                      onSelected: (selected) {
-                        setState(() {
-                          filter = name;
-                        });
-                      },
-                    ),
+                const Text(
+                  'My Tasks',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'You have ${tasks.length} tasks today',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 137, 136, 136),
                   ),
+                ),
+
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    for (final name in ['All', 'Active', 'Completed'])
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(name),
+                          selected: filter == name,
+                          onSelected: (selected) {
+                            setState(() {
+                              filter = name;
+                            });
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredTasks.length,
+                    itemBuilder: (context, index) {
+                      final task = filteredTasks[index];
+
+                      return TaskTile(
+                        task: task,
+                        onTap: () {
+                          toggleTask(task);
+                        },
+                        onDelete: () {
+                          deleteTask(task);
+                        },
+                        onEdit: () {
+                          editTask(task);
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
+          ),
 
-            const SizedBox(height: 12),
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredTasks.length,
-                itemBuilder: (context, index) {
-                  final task = filteredTasks[index];
-
-                  return TaskTile(
-                    task: task,
-                    onTap: () {
-                      toggleTask(task);
-                    },
-                    onDelete: () {
-                      deleteTask(task);
-                    },
-                    onEdit: () {
-                      editTask(task);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: addTask,
-        child: const Icon(Icons.add),
-      ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: addTask,
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 }

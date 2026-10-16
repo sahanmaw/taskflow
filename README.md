@@ -1,17 +1,13 @@
 # taskflow
 
-A new Flutter project.
+TaskFlow is a simple to-do application built with Flutter and Dart. It allows users to manage their daily tasks.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Add new tasks
+- Edit and delete tasks
+- Mark tasks as completed
+- Filter tasks by All, Active and Completed
+- View total, active and completed task counts
+- Save tasks locally
+- Fetch and display tasks from an API

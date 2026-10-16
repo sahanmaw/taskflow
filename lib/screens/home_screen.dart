@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../widgets/task_tile.dart';
+import 'add_task_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +24,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void addTask(String title) {
+  Future<void> addTask() async {
+    final title = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const AddTaskScreen()),
+    );
+
+    if (!mounted || title == null || title.isEmpty) {
+      return;
+    }
+
     setState(() {
       tasks.add(
         Task(
@@ -75,9 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint('Add task clicked');
-        },
+        onPressed: addTask,
         child: const Icon(Icons.add),
       ),
     );

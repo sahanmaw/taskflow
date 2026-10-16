@@ -70,6 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocBuilder<TaskCubit, List<Task>>(
       builder: (context, tasks) {
         List<Task> filteredTasks = tasks;
+        int totalTasks = tasks.length;
+        int completedTasks = tasks.where((task) => task.isCompleted).length;
+        int activeTasks = totalTasks - completedTasks;
 
         if (filter == 'Active') {
           filteredTasks = tasks.where((task) => !task.isCompleted).toList();
@@ -79,9 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('TaskFlow'),
+            title: const Text(
+              'TaskFlow',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             centerTitle: true,
-
             actions: [
               IconButton(
                 icon: const Icon(Icons.cloud_download),
@@ -110,11 +115,63 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 8),
 
-                Text(
-                  'You have ${tasks.length} tasks today',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 137, 136, 136),
+                Container(
+                  padding: const EdgeInsets.all(20),
+
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            '$totalTasks',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.indigo,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text('Total'),
+                        ],
+                      ),
+
+                      Column(
+                        children: [
+                          Text(
+                            '$activeTasks',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text('Active'),
+                        ],
+                      ),
+
+                      Column(
+                        children: [
+                          Text(
+                            '$completedTasks',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text('Completed'),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
 

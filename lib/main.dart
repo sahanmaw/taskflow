@@ -16,8 +16,23 @@ class TaskFlowApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TaskFlow',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
+
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+
+        scaffoldBackgroundColor: const Color(0xFFF6F7FB),
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFF6F7FB),
+          foregroundColor: Color(0xFF1F2937),
+          elevation: 0,
+          centerTitle: false,
+        ),
+
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+        ),
       ),
       home: BlocProvider(
         create: (context) {

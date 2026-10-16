@@ -42,6 +42,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   Navigator.pop(context, title);
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               child: const Text('Save Task'),
             ),
           ],

@@ -5,12 +5,14 @@ class TaskTile extends StatelessWidget {
   final Task task;
   final VoidCallback onTap;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   const TaskTile({
     super.key,
     required this.task,
     required this.onTap,
     required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -30,9 +32,15 @@ class TaskTile extends StatelessWidget {
               : TextDecoration.none,
         ),
       ),
-      trailing: IconButton(
-        icon: const Icon(Icons.delete_outline),
-        onPressed: onDelete,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(icon: const Icon(Icons.edit_outlined), onPressed: onEdit),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: onDelete,
+          ),
+        ],
       ),
     );
   }

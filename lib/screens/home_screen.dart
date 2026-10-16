@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../widgets/task_tile.dart';
 import 'add_task_screen.dart';
+import 'edit_task_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,12 +25,32 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  //delete task from the list
   void deleteTask(Task task) {
     setState(() {
       tasks.remove(task);
     });
   }
 
+  //edit task title
+  Future<void> editTask(Task task) async {
+    final title = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTaskScreen(title: task.title),
+      ),
+    );
+
+    if (!mounted || title == null || title.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      task.title = title;
+    });
+  }
+
+  //add new task to the list
   Future<void> addTask() async {
     final title = await Navigator.push<String>(
       context,
@@ -66,9 +87,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 8),
 
-            Text('You have ${tasks.length} tasks today'),
+            Text(
+              'You have ${tasks.length} tasks today',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Color.fromARGB(255, 137, 136, 136),
+              ),
+            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             Expanded(
               child: ListView.builder(
@@ -83,6 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     onDelete: () {
                       deleteTask(task);
+                    },
+                    onEdit: () {
+                      editTask(task);
                     },
                   );
                 },
